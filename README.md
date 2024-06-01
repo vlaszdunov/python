@@ -1,8 +1,8 @@
 # Python Docker Images
 
 Avaliable Versions
-| Python 3.10 | Python 3.11 | Python 3.12 | Python latest |
-|-------------|-------------|-------------|---------------|
+| Python latest | Python 3.12 | Python 3.11 | Python 3.10 |
+|-|-|-|-|
 
 ### Using as base image
 If you want to use this images as Base image in your Dockerfile\
