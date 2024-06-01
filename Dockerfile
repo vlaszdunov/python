@@ -14,7 +14,7 @@ RUN apk add --no-cache \
     sqlite-dev \
     wget \
     && cd /usr/src \
-    && wget https://www.python.org/ftp/python/3.9.13/Python-3.12.3.tgz \
+    && wget https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tgz \
     && tar xzf Python-3.12.3.tgz \
     && cd Python-3.12.3 \
     && ./configure --enable-optimizations \
