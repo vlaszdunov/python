@@ -2,7 +2,6 @@ name: build and push
 run-name: Build and push Python images to GHCR
 
 on:
-  push:
   schedule:
     - cron: 0 0 * * *
 env:
@@ -30,8 +29,14 @@ jobs:
 
       - name: Build Python Images
         run: |
-          docker build . --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12.3
+          docker build . --target III.X --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.10
+          docker build . --target III.XI --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.11
+          docker build . --target III.XII --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
+          docker build . --target latest --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
 
       - name: Publish Python Images
         run: |
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12.3
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.10
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.11
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
