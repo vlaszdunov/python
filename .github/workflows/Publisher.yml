@@ -2,6 +2,7 @@ name: build and push
 run-name: Build and push Python images to GHCR
 
 on:
+  push:
   schedule:
     - cron: 0 0 * * *
 env:
