@@ -18,7 +18,7 @@ RUN apk add --no-cache \
     && tar xzf Python-3.12.3.tgz \
     && cd Python-3.12.3 \
     && ./configure --enable-optimizations \
-    && make altinstall \
+    && make install \
     && ln -s /usr/local/bin/python3.12 /usr/bin/python3 \
     && ln -s /usr/local/bin/pip3.12 /usr/bin/pip3 \
     && apk del build-base \
