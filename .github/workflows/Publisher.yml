@@ -30,8 +30,8 @@ jobs:
 
       - name: Build Python Images
         run: |
-          docker build . --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
+          docker build . --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12.3
 
       - name: Publish Python Images
         run: |
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12.3
