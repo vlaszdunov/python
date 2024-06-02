@@ -1,6 +1,6 @@
 FROM alpine as build
 
-RUN mkdir /usr/bin/
+RUN mkdir /usr/src/
 
 # install dependencies and python
 RUN apk add --no-cache \
