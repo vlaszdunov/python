@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Generated_Dockerfiles
-          path: /Python_dockerfiles/
+          path: Python_dockerfiles/
     outputs:
       param: ${{ steps.array.outputs.build }}
 
@@ -59,12 +59,11 @@ jobs:
       matrix:
         param: ${{ fromJson(needs.setup.outputs.param) }}
     steps:
-      - name: Download a single artifact
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: Generated_Dockerfiles
       - run: |
-          echo ${{ matrix.param }}
           docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}} /Python_dockerfiles
           docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}}
 
