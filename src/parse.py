@@ -1,19 +1,28 @@
 import requests
 from bs4 import BeautifulSoup as bs
-import lxml
 
-SOURCE_URL = 'https://www.python.org/downloads/source/'
+URL = 'https://www.python.org/downloads/'
 
-response = requests.get(SOURCE_URL).text
-soup = bs(response, 'lxml')
-data = soup.find_all('div', {'class': 'column'})
-links = []
-l=[]
-for column in data:
-    if column.find('h2').text == 'Stable Releases':
-        links = column.find_all('a')
+# get list of active releases
+response = requests.get(URL).text
 
-for link in links:
-    if link.text =='Gzipped source tarball':
-        l.append(link.get('href'))
-print(l,sep='\n')
+page_data = bs(response, 'lxml')
+actual_versions_raw_list = page_data.find_all(
+    'span', attrs={'class': 'release-version'})
+
+actual_releases_list = []
+for span in actual_versions_raw_list:
+    actual_releases_list.append(span.text)
+
+
+# get all stable releases
+response = requests.get(f'{URL}source/').text
+page_data = bs(response, 'lxml')
+stable_releases_raw_links = page_data.find_all('a')
+
+stable_releases_links = []
+
+
+for link in stable_releases_raw_links:
+    if link.text == 'Gzipped source tarball':
+        stable_releases_links.append(link.get('href'))
