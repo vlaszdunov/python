@@ -64,6 +64,6 @@ jobs:
         with:
           name: Generated_Dockerfiles
       - run: |
-          docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}} /Python_dockerfiles
+          docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}} Python_dockerfiles/
           docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}}
 
