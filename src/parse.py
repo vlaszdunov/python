@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup as bs
 import re
+import os
 
 URL = 'https://www.python.org/downloads/'
 
@@ -27,7 +28,6 @@ for link in releases_raw_download_links:
 
 
 actual_stable_releases_links = []
-
 for actual_release in active_releases_list:
     for link in releases_download_links:
         check = re.fullmatch(r'.*Python-\d*.\d*.?\d*.tgz', link)
@@ -37,10 +37,12 @@ for actual_release in active_releases_list:
                 break
 
 Dockerfile_temp = open('Dockerfile.template').read()
+if os.path.exists('Python_dockerfiles')==False:
+    os.mkdir('Python_dockerfiles')
 for link in actual_stable_releases_links:
     py_version = re.search(r'\d+.\d+.?\d*', link)[0]
     py_short_version = re.search(r'\d+.\d+', py_version)[0]
     Dockerfile = Dockerfile_temp.format(python_link=link,
                                    python_version=py_version,
                                    python_short_version=py_short_version)
-    open(f'Dockerfile_{py_version}','w').write(Dockerfile)
+    open(f'Python_dockerfiles/Dockerfile_{py_version}','w').write(Dockerfile)

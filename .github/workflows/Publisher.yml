@@ -2,6 +2,7 @@ name: build and push
 run-name: Build and push Python images to GHCR
 
 on:
+  push:
   schedule:
     - cron: 0 0 * * *
 env:
@@ -9,11 +10,12 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-publish:
+  Setup-Dckerfiles:
     permissions:
       contents: read
       packages: write
       id-token: write
+      
 
     runs-on: ubuntu-latest
     steps:
@@ -27,16 +29,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Python Images
-        run: |
-          docker build . --target III.X --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.10
-          docker build . --target III.XI --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.11
-          docker build . --target III.XII --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
-          docker build . --target latest --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: latest
 
-      - name: Publish Python Images
-        run: |
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.10
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.11
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
+      - name: install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create Dockerfiles of Python Images
+        run: python /src/parse.py
+
+  matrix_input:
+    needs: Setup-Dckerfiles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: danyow/json-matrix-builder@v0.5.0
+        id: array
+        with:
+          cmd: ls Python_dockerfiles
+          separator: newline
+    outputs:
+      param: ${{ steps.array.outputs.build }}
+
+  dynamic_matrix:
+    needs:
+      - matrix_input
+    strategy:
+      matrix:
+        param: ${{ fromJson(needs.matrix_input.outputs.param) }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo ${{ matrix.param }}
