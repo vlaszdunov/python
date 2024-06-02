@@ -39,6 +39,7 @@ jobs:
 
       - name: Create Dockerfiles of Python Images
         run: python ./src/parse.py
+
       - uses: danyow/json-matrix-builder@v0.5.0
         id: array
         with:
@@ -64,6 +65,6 @@ jobs:
         with:
           name: Generated_Dockerfiles
       - run: |
-          docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}} .
+          docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job.name}} --file ${{github.job.name}}
           docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}}
 
