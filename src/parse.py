@@ -37,12 +37,20 @@ for actual_release in active_releases_list:
                 break
 
 Dockerfile_temp = open('Dockerfile.template').read()
-if os.path.exists('Python_dockerfiles')==False:
+if os.path.exists('Python_dockerfiles') == False:
     os.mkdir('Python_dockerfiles')
 for link in actual_stable_releases_links:
     py_version = re.search(r'\d+.\d+.?\d*', link)[0]
     py_short_version = re.search(r'\d+.\d+', py_version)[0]
     Dockerfile = Dockerfile_temp.format(python_link=link,
-                                   python_version=py_version,
-                                   python_short_version=py_short_version)
-    open(f'Python_dockerfiles/Dockerfile_{py_version}','w').write(Dockerfile)
+                                        python_version=py_version,
+                                        python_short_version=py_short_version)
+    open(f'Python_dockerfiles/{py_version}', 'w').write(Dockerfile)
+    open(f'Python_dockerfiles/{py_short_version}', 'w').write(Dockerfile)
+    if actual_stable_releases_links.index(link) == 0:
+        ver_short_version = re.sub(r'\.\d*', '', py_short_version)
+        open('Python_dockerfiles/latest', 'w').write(Dockerfile)
+        open(f'Python_dockerfiles/{ver_short_version}.temp',
+             'w').write(Dockerfile)
+        os.rename(f'Python_dockerfiles/{ver_short_version}.temp',
+                  f'Python_dockerfiles/{ver_short_version}')

@@ -56,4 +56,6 @@ jobs:
     steps:
       - run: |
           echo ${{ matrix.param }}
+          docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}}
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}}
 
