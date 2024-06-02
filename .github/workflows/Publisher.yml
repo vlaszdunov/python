@@ -10,7 +10,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  Setup-Dckerfiles:
+  setup:
     permissions:
       contents: read
       packages: write
@@ -39,22 +39,6 @@ jobs:
 
       - name: Create Dockerfiles of Python Images
         run: python ./src/parse.py
-      
-      - uses: actions/upload-artifact@master
-        with:
-          name: my-artifact
-          path: /Python_dockerfiles
-
-
-  matrix_input:
-    needs: Setup-Dckerfiles
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@master
-        with:
-          name: my-artifact
-          path: /Python_dockerfiles
       - uses: danyow/json-matrix-builder@v0.5.0
         id: array
         with:
@@ -63,13 +47,13 @@ jobs:
     outputs:
       param: ${{ steps.array.outputs.build }}
 
-  dynamic_matrix:
-    needs:
-      - matrix_input
+  matrix_input:
+    needs: setup
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        param: ${{ fromJson(needs.matrix_input.outputs.param) }}
-    runs-on: ubuntu-latest
+        param: ${{ fromJson(needs.setup.outputs.param) }}
     steps:
       - run: |
           echo ${{ matrix.param }}
+
