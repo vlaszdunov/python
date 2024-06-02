@@ -45,10 +45,10 @@ jobs:
           cmd: ls Python_dockerfiles
           separator: newline
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4
         with:
           name: Generated_Dockerfiles
-          path: /Python_dockerfiles
+          path: /Python_dockerfiles/
     outputs:
       param: ${{ steps.array.outputs.build }}
 
@@ -60,7 +60,7 @@ jobs:
         param: ${{ fromJson(needs.setup.outputs.param) }}
     steps:
       - name: Download a single artifact
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v4
         with:
           name: Generated_Dockerfiles
       - run: |
