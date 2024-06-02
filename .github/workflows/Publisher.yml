@@ -45,7 +45,7 @@ jobs:
           cmd: ls Python_dockerfiles
           separator: newline
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: Generated_Dockerfiles
           path: /Python_dockerfiles
