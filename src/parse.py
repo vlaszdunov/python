@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as bs
 import re
 
 URL = 'https://www.python.org/downloads/'
-в
+
 # get list of active releases
 response = requests.get(URL).text
 
