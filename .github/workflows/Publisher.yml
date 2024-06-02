@@ -22,13 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{env.REGISTRY}}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -60,12 +53,19 @@ jobs:
       matrix:
         param: ${{ fromJson(needs.setup.outputs.param) }}
     steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{env.REGISTRY}}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: Generated_Dockerfiles
       - run: |
           echo ${{matrix.param}}
-          docker build --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job.name}} --file ${{matrix.param}}
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{github.job}}
+          docker build --file ${{matrix.param}} --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{matrix.param}} .
+          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{matrix.param}}
 
