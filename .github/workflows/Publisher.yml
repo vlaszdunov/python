@@ -10,12 +10,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  setup:
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-      
+  setup:      
 
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +42,10 @@ jobs:
       param: ${{ steps.array.outputs.build }}
 
   matrix_input:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     needs: setup
     runs-on: ubuntu-latest
     strategy:
