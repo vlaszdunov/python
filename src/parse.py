@@ -21,19 +21,19 @@ response = requests.get(f'{URL}source/').text
 page_data = bs(response, 'lxml')
 stable_releases_raw_links = page_data.find_all('a')
 
-stable_releases_links = []
+releases_links = []
 for link in stable_releases_raw_links:
-    if '.tar.xz' not in link.get('href') and '.tgz' in link.get('href'):
-        stable_releases_links.append(link.get('href'))
+    releases_links.append(link.get('href'))
 
-actual_stable_releases = []
-stable_releases_links = re.findall(
-    r'.*/\d*.\d*.?\d*/Python-\d*.\d*.?\d*.tgz', str(stable_releases_links))[0].replace('\'', '').split(', ')
-stable_releases_links[0] = stable_releases_links[0][1:]
 
-for link in stable_releases_links:
-    if re.sub(r'.?\d*/Python.*', '', link)[34:] in actual_releases_list:
-        actual_stable_releases.append(link)
-# print(*stable_releases_links, sep='\n')
-print(actual_stable_releases)
+actual_stable_releases_links = []
+
+for actual_release in actual_releases_list:
+    for link in releases_links:
+        check = re.fullmatch(r'.*Python-\d*.\d*.?\d*.tgz', link)
+        if check:
+            if actual_release in re.sub(r'.?\d*/Python*', '', link):
+                actual_stable_releases_links.append(link)
+                break
+print(actual_stable_releases_links)
 print(actual_releases_list)
