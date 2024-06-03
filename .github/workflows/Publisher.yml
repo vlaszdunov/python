@@ -67,15 +67,15 @@ jobs:
 
       - name: building images
         run: docker build --file ${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}} .
-      
+
       - name: Publishing images
         run: |
-          $tags = $(cat ${{matrix.param}}/tags.txt)
+          $tags=$(cat ${{matrix.param}}/tags.txt)
           IFS=$'\n'
           for tag in $tags; do
             docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:$tag
           done
-      
+
       - name: delete artifacts
         uses: geekyeggo/delete-artifact@v1
         with:
