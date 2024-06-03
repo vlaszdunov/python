@@ -2,24 +2,57 @@ name: build and push
 run-name: Build and push Python images to GHCR
 
 on:
+  push:
   schedule:
     - cron: 0 0 * * *
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  MAIN_BRANCH: "main"
 
 jobs:
-  build-and-publish:
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create Dockerfiles of Python Images
+        run: python ./src/parse.py
+
+      - uses: danyow/json-matrix-builder@v0.5.0
+        id: array
+        with:
+          cmd: ls Python_dockerfiles
+          separator: newline
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: Generated_Dockerfiles
+          path: Python_dockerfiles/
+          retention-days: 1
+    outputs:
+      param: ${{ steps.array.outputs.build }}
+
+  matrix_input:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        param: ${{ fromJson(needs.setup.outputs.param) }}
+    steps:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -27,16 +60,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Python Images
-        run: |
-          docker build . --target III.X --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.10
-          docker build . --target III.XI --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.11
-          docker build . --target III.XII --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
-          docker build . --target latest --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Generated_Dockerfiles
 
-      - name: Publish Python Images
+      - name: building images
         run: |
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.10
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.11
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:3.12
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:latest
+          tags=$(cat ${{matrix.param}}/tags.txt)
+          IFS=$'\n'
+          for tag in $tags; do
+            docker build -q --file ${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:$tag .
+          done
+
+      - name: Publishing images
+        run: |
+          tags=$(cat ${{matrix.param}}/tags.txt)
+          IFS=$'\n'
+          for tag in $tags; do
+            docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:$tag
+          done
+
+      - name: delete artifacts
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: Generated_Dockerfiles
