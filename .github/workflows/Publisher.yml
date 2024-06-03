@@ -64,10 +64,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Generated_Dockerfiles
-      - run: ls
 
       - name: building images
-        run: docker build --file /${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}} > /dev/null 2>&1
+        run: docker build --file /${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
       
       - name: Publishing images
         run: |
