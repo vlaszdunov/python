@@ -8,10 +8,10 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  MAIN_BRANCH: "main"
 
 jobs:
-  setup:      
-
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,11 +33,12 @@ jobs:
         with:
           cmd: ls Python_dockerfiles
           separator: newline
-      - name: 'Upload Artifact'
+      - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
         with:
           name: Generated_Dockerfiles
           path: Python_dockerfiles/
+          retention-days: 1
     outputs:
       param: ${{ steps.array.outputs.build }}
 
@@ -58,13 +59,24 @@ jobs:
           registry: ${{env.REGISTRY}}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: Generated_Dockerfiles
-      - run: |
-          echo ${{matrix.param}}
-          docker build --file ${{matrix.param}} --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{matrix.param}} .
-          docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{matrix.param}}
 
+      - name: building images
+        run: docker build --quit --file ${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}} .
+      
+      - name: Publishing images
+        run: |
+          tags = $(cat ${{matrix.param}}/tags.txt)
+          IFS=$'\n'
+          for tag in $tags; do
+            docker push ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:$tag
+          done
+      
+      - name: вудуеу фкешафсеы
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: Generated_Dockerfiles
