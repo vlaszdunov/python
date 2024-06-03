@@ -66,7 +66,12 @@ jobs:
           name: Generated_Dockerfiles
 
       - name: building images
-        run: docker build -q --file ${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}} .
+        run: |
+          tags=$(cat ${{matrix.param}}/tags.txt)
+          IFS=$'\n'
+          for tag in $tags; do
+            docker build -q --file ${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:$tag .
+          done
 
       - name: Publishing images
         run: |
