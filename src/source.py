@@ -12,7 +12,7 @@ request_headers = {
 response = requests.get(URL, request_headers).text
 
 page_data = bs(response, 'lxml')
-page_data.con
+
 actual_versions_raw_list = page_data.find_all(
     'span', attrs={'class': 'release-version'})
 

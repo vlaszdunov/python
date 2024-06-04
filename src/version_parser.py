@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 
 import requests
 from bs4 import BeautifulSoup as bs
@@ -13,5 +14,14 @@ def get_page_content(internal_page: str = '') -> bs:
     return bs(page_content, 'lxml')
 
 
-def get_active_versions(versions_page_internal_url: str):
-    pass
+def get_active_versions(internal_url: str) -> list[str]:
+    page_content = get_page_content(internal_url)
+    active_versions_raw_list = page_content.find_all(
+        'span', attrs={'class': 'release-version'})
+
+    active_versions_list = []
+    for element in active_versions_raw_list:
+        if re.match(r'\d+.\d+', element.text):
+            active_versions_list.append(element.text)
+
+    return active_versions_list
