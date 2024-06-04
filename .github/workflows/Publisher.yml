@@ -82,6 +82,6 @@ jobs:
           done
 
       - name: delete artifacts
-        uses: geekyeggo/delete-artifact@v1
+        uses: geekyeggo/delete-artifact@v5
         with:
           name: Generated_Dockerfiles
