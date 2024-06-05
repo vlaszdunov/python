@@ -2,6 +2,7 @@ name: build checker
 run-name: Build and Python images
 
 on:
+  pull_request:
   push:
     branches-ignore: main
 env:
@@ -22,52 +23,10 @@ jobs:
           python-version: 3.12
 
       - name: install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements/requirements.txt
 
-      - name: Create Dockerfiles of Python Images
-        run: python ./src/parse.py
+      - name: install dev dependencies
+        run: pip install -r requirements/requirements-dev.txt
 
-      - uses: danyow/json-matrix-builder@v0.5.0
-        id: array
-        with:
-          cmd: ls Python_dockerfiles
-          separator: newline
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v4
-        with:
-          name: Generated_Dockerfiles
-          path: Python_dockerfiles/
-          retention-days: 1
-    outputs:
-      param: ${{ steps.array.outputs.build }}
-
-  matrix_input:
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    needs: setup
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        param: ${{ fromJson(needs.setup.outputs.param) }}
-
-    steps:
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: Generated_Dockerfiles
-
-      - name: building images
-        run: |
-          tags=$(cat ${{matrix.param}}/tags.txt)
-          IFS=$'\n'
-          for tag in $tags; do
-            docker build -q --file ${{matrix.param}}/Dockerfile --tag ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:$tag .
-          done
-
-      - name: delete artifacts
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: Generated_Dockerfiles
+      - name: Run tests
+        run: python -m pytest

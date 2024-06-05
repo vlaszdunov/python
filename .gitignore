@@ -7,3 +7,6 @@ __pycache__
 
 # ide-staff
 .vscode
+
+# Unit test
+.pytest_cache
