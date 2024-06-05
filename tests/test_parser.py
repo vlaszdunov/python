@@ -1,8 +1,13 @@
+from pathlib import Path
+
 import pytest
 
 from src.version_parser import *
 
 BASE_URL = 'https://www.python.org/'
+
+
+test_html = bs(Path('tests/test_html.html').read_text(), 'lxml')
 
 
 def test_get_page_content():
@@ -11,7 +16,5 @@ def test_get_page_content():
 
 
 def test_get_versions():
-    # Проверяем, что функция get_versions() использует результаты get_data()
-    actual_versions = get_active_versions('downloads/')
-    # Предположим, что это версии, которые мы ожидаем получить
-    assert actual_versions.__class__==list
+    actual_versions = get_active_versions(test_html)
+    assert actual_versions == ['3.11']
