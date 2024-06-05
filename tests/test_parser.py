@@ -27,7 +27,7 @@ def test_get_active_versions():
 def test_get_stable_releases_link():
     active_versions_links = get_stable_releases_links(
         test_download_links_page, ['3.11'])
-    assert active_versions_links == correct_test_download_link
+    assert active_versions_links == correct_test_download_links
 
 def test_get_newest_releases_links():
     latest_releases_links = get_newest_releases_links(correct_test_download_links)
