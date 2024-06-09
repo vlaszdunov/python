@@ -26,7 +26,7 @@ def get_active_versions(page_content: bs) -> list[str]:
     return active_versions_list
 
 
-def get_stable_releases_links(page_content: bs, active_versions_list: list)->list[str]:
+def get_stable_releases_links(page_content: bs, active_versions_list: list) -> list[str]:
     active_stable_releases_link = []
     stable_releases_links = page_content.find_all('a')
     for link in stable_releases_links:
@@ -37,5 +37,17 @@ def get_stable_releases_links(page_content: bs, active_versions_list: list)->lis
     return active_stable_releases_link
 
 
-def get_newest_releases_links(active_stable_releases_link: list[str]) -> list[str]:
-    pass
+def group_releases_by_major_version(active_stable_releases_link: list[str], active_versions: list[str]):
+    last_stable_releases = dict.fromkeys(active_versions)
+    for key in last_stable_releases:
+        last_stable_releases[key] = []
+
+    for link in active_stable_releases_link:
+        a = re.search(r'\d+.\d+', link)[0]
+        last_stable_releases[a].append(link)
+
+    return last_stable_releases
+
+
+# group_releases_by_major_version(get_stable_releases_links(get_page_content(BASE_URL, 'downloads/source/'),
+#                                                           get_active_versions(get_page_content(BASE_URL, 'downloads/'))), get_active_versions(get_page_content(BASE_URL, 'downloads/')))

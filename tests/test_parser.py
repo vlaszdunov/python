@@ -5,8 +5,8 @@ import pytest
 from src.version_parser import *
 
 BASE_URL = 'https://www.python.org/'
-correct_test_download_links = ['https://www.python.org/ftp/python/3.11.5/Python-3.11.4.tgz',\
-                              'https://www.python.org/ftp/python/3.11.5/Python-3.11.9.tgz']
+correct_test_download_links = ['https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz',
+                               'https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz']
 
 test_active_version_page = bs(Path('tests/test_active_versions.html')
                               .read_text(), 'lxml')
@@ -29,6 +29,10 @@ def test_get_stable_releases_link():
         test_download_links_page, ['3.11'])
     assert active_versions_links == correct_test_download_links
 
-def test_get_newest_releases_links():
-    latest_releases_links = get_newest_releases_links(correct_test_download_links)
-    assert latest_releases_links == ['https://www.python.org/ftp/python/3.11.5/Python-3.11.9.tgz']
+
+def test_grouping_releases_by_major_version():
+    latest_releases_links = group_releases_by_major_version(
+        correct_test_download_links, ['3.11'])
+    print(latest_releases_links)
+    assert latest_releases_links == {
+        '3.11': correct_test_download_links}
