@@ -1,0 +1,32 @@
+name: build checker
+run-name: Build and Python images
+
+on:
+  pull_request:
+  push:
+    branches-ignore: main
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  MAIN_BRANCH: "main"
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: install dependencies
+        run: pip install -r requirements/requirements.txt
+
+      - name: install dev dependencies
+        run: pip install -r requirements/requirements-dev.txt
+
+      - name: Run tests
+        run: python -m pytest

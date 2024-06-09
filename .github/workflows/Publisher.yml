@@ -3,6 +3,7 @@ run-name: Build and push Python images to GHCR
 
 on:
   push:
+    branches: main
   schedule:
     - cron: 0 0 * * *
 env:

@@ -1,5 +1,12 @@
+#byte-compiled
+__pycache__
+
 # Environment
 .venv
+.env
 
 # ide-staff
 .vscode
+
+# Unit test
+.pytest_cache
